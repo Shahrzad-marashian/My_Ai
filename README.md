@@ -21,8 +21,3 @@ pip install -r requirements.txt
 ## Running the Pipeline
 After placing the Kaggle CSV files in the `data/ashrae-energy-prediction/` directory and installing dependencies, execute:
 
-```bash
-python main.py
-```
-
-The script will merge the datasets, display a histogram of meter readings, train a `RandomForestRegressor`, and print the RMSLE metric.

@@ -1,0 +1,37 @@
+Instructions for project 
+ 
+________________________________________________________________________________ 
+Following are the instructions for your project work: 
+ 
+Project description:  As discussed previously, you need to find the dataset, preferably related to your PhD studies, to apply the concepts learned in the course. We expect the following minimum operation to be performed over the dataset :  
+a.	Introduction about dataset 
+b.	Data pre-processing 
+c.	Data visualization – scatter/line/hist plots, correlation plots 
+d.	Data preparation for ML – scaling, feature extraction etc. 
+e.	Applying different ML models – comparing models using performance metrics, accuracies 
+f.	Optimization ( if your problem definition involves finding the optimized parameters)  
+g.	Uncertainty evaluation of your model 
+h.	Dynamic programming and optimal control (if applicable to your dataset) 
+i.	Results discussions 
+ 
+Report: The following documents should be submitted as a part of the project:  
+a.	PDF file of a report of the analysis in the conference paper format – template can be found here:   Project ( available in our teams channel under the folder ‘Project’ / also attached to this email) 
+b.	Python script files: Please add comments in the script for every operation/line of code 
+ 
+Please zip the above two files with your name and upload them to the teams under the folder ‘project’.  
+ 
+Deadline: There are two deadlines by which you can submit the project: 
+First deadline: 3oth April 2024 
+Final deadline: 15th  May 2024 
+( Any challenges regarding the deadline, pl discuss them with me) 
+__________________________________________________________________________________ 
+ 
+Those who have still not found the dataset, can discuss it with researchers in the department and ask about the possibilities to collaborate.  
+Or lastly, you could get the open source dataset from the internet like :  
+https://www.kaggle.com/datasets 
+https://plos.org/open-science/open-data/ 
+ 
+ 
+Please reach out to me for any clarification or issues you may have. 
+ 
+
