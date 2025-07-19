@@ -2,13 +2,14 @@
 venv/
 .env/
 
-# Ignore dataset files
+# Ignore all dataset files except sample data
 data/ashrae-energy-prediction/
 data/**/*.csv
+!data/sample/
+!data/sample/*.csv
 
 # Ignore common unwanted files
 __pycache__/
 *.pyc
 .DS_Store
 .ipynb_checkpoints/
-
