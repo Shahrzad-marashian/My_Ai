@@ -1,0 +1,14 @@
+# Ignore virtual environment
+venv/
+.env/
+
+# Ignore dataset files
+data/ashrae-energy-prediction/
+data/**/*.csv
+
+# Ignore common unwanted files
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+
