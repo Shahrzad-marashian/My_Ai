@@ -13,6 +13,7 @@ import joblib
 
 from sample_preprocess import preprocess_samples
 from sample_ml_prep import prepare_for_ml
+from sklearn.model_selection import train_test_split
 
 
 def plot_model_performance(model, X_test: pd.DataFrame, y_test: pd.Series, out_dir: Path) -> None:
@@ -151,11 +152,31 @@ def tune_random_forest(
 def main() -> None:
     data_dir = Path("data/sample")
     df = preprocess_samples(data_dir)
+
+    # Preserve identifying columns for later predictions
+    info = df[["building_id", "timestamp"]].copy()
+
     X_train, X_test, y_train, y_test = prepare_for_ml(df)
-    save_path = Path("results/best_sample_model.pkl")
+
+    # Split the info dataframe in the same way as features
+    _, info_test = train_test_split(info, test_size=0.2, random_state=42)
+
     plot_dir = Path("results/model_plots")
-    train_and_compare(X_train, X_test, y_train, y_test, save_path, plot_dir)
-    tune_random_forest(X_train, X_test, y_train, y_test)
+    train_and_compare(X_train, X_test, y_train, y_test, None, plot_dir)
+
+    # Hyperparameter tuning and evaluation
+    best_model = tune_random_forest(X_train, X_test, y_train, y_test)
+
+    # Save the best model
+    model_path = Path("results/best_sample_model.pkl")
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(best_model, model_path)
+    print(f"Saved best model to {model_path}")
+
+    # Save the test data for the prediction script
+    test_data_path = Path("results/test_data.pkl")
+    joblib.dump((X_test, y_test, info_test), test_data_path)
+    print(f"Saved test data to {test_data_path}")
 
 
 if __name__ == "__main__":
