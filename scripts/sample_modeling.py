@@ -8,6 +8,7 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import RandomizedSearchCV
 import joblib
 
 from sample_preprocess import preprocess_samples
@@ -110,6 +111,43 @@ def train_and_compare(
         plot_model_performance(best_model, X_test_filled, y_test, plot_dir)
 
 
+def tune_random_forest(
+    X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series
+) -> RandomForestRegressor:
+    """Hyperparameter tuning for RandomForestRegressor using RandomizedSearchCV."""
+    param_dist = {
+        "n_estimators": [50, 100, 200],
+        "max_depth": [10, 20, 40, None],
+        "min_samples_split": [2, 5, 10],
+        "min_samples_leaf": [1, 2, 4],
+    }
+
+    search = RandomizedSearchCV(
+        RandomForestRegressor(random_state=42),
+        param_distributions=param_dist,
+        n_iter=10,
+        cv=3,
+        scoring="neg_mean_squared_error",
+        random_state=42,
+        n_jobs=-1,
+    )
+
+    X_train_filled = X_train.fillna(0)
+    search.fit(X_train_filled, y_train)
+    print("Best RandomForest Params:", search.best_params_)
+    print(f"Best CV Score (neg MSE): {search.best_score_:.4f}")
+
+    best_model = search.best_estimator_
+    # Retrain on the full training data for evaluation consistency
+    best_model.fit(X_train_filled, y_train)
+
+    preds = best_model.predict(X_test.fillna(0))
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    r2 = r2_score(y_test, preds)
+    print(f"Tuned RandomForest - RMSE: {rmse:.4f}, R^2: {r2:.4f}")
+    return best_model
+
+
 def main() -> None:
     data_dir = Path("data/sample")
     df = preprocess_samples(data_dir)
@@ -117,6 +155,7 @@ def main() -> None:
     save_path = Path("results/best_sample_model.pkl")
     plot_dir = Path("results/model_plots")
     train_and_compare(X_train, X_test, y_train, y_test, save_path, plot_dir)
+    tune_random_forest(X_train, X_test, y_train, y_test)
 
 
 if __name__ == "__main__":
