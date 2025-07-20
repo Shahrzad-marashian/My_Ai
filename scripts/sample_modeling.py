@@ -126,15 +126,20 @@ def tune_random_forest(
     search = RandomizedSearchCV(
         RandomForestRegressor(random_state=42),
         param_distributions=param_dist,
-        n_iter=10,
-        cv=3,
+        n_iter=5,
+        cv=2,
         scoring="neg_mean_squared_error",
         random_state=42,
         n_jobs=-1,
     )
 
+    sample_n = min(len(X_train), 50_000)
+    X_sample = X_train.fillna(0).sample(n=sample_n, random_state=42)
+    y_sample = y_train.loc[X_sample.index]
+
+    search.fit(X_sample, y_sample)
+
     X_train_filled = X_train.fillna(0)
-    search.fit(X_train_filled, y_train)
     print("Best RandomForest Params:", search.best_params_)
     print(f"Best CV Score (neg MSE): {search.best_score_:.4f}")
 
@@ -161,20 +166,32 @@ def main() -> None:
     # Split the info dataframe in the same way as features
     _, info_test = train_test_split(info, test_size=0.2, random_state=42)
 
-    plot_dir = Path("results/model_plots")
+    base_dir = Path("results")
+    plot_dir = base_dir / "model_plots"
     train_and_compare(X_train, X_test, y_train, y_test, None, plot_dir)
 
-    # Hyperparameter tuning and evaluation
-    best_model = tune_random_forest(X_train, X_test, y_train, y_test)
+    choice = input("Do you want to perform RandomizedSearchCV tuning? (y/n) ").strip().lower()
+    if choice == "y":
+        print("Running hyperparameter tuning...")
+        best_model = tune_random_forest(X_train, X_test, y_train, y_test)
+    else:
+        print("Skipping tuning. Training default RandomForestRegressor...")
+        rf = RandomForestRegressor(n_estimators=100, random_state=42)
+        rf.fit(X_train.fillna(0), y_train)
+        preds = rf.predict(X_test.fillna(0))
+        rmse = np.sqrt(mean_squared_error(y_test, preds))
+        r2 = r2_score(y_test, preds)
+        print(f"Default RandomForest - RMSE: {rmse:.4f}, R^2: {r2:.4f}")
+        best_model = rf
 
     # Save the best model
-    model_path = Path("results/best_sample_model.pkl")
+    model_path = base_dir / "best_sample_model.pkl"
     model_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(best_model, model_path)
     print(f"Saved best model to {model_path}")
 
     # Save the test data for the prediction script
-    test_data_path = Path("results/test_data.pkl")
+    test_data_path = base_dir / "test_data.pkl"
     joblib.dump((X_test, y_test, info_test), test_data_path)
     print(f"Saved test data to {test_data_path}")
 
