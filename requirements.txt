@@ -1,7 +1,8 @@
-nginx
+# nginx
 pandas
 numpy
 matplotlib
 seaborn
 scikit-learn
 jupyter
+shap>=0.41.0
