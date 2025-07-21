@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # use non-interactive backend for script execution
 import matplotlib.pyplot as plt
@@ -12,14 +13,25 @@ def plot_sample_visualizations(df: pd.DataFrame, out_dir: Path) -> None:
     """Create plots for the preprocessed sample dataset and save them."""
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Add log1p transformed column
+    df["log_meter_reading"] = np.log1p(df["meter_reading"])
+
     # 1. Histograms
     plt.figure()
-    sns.histplot(df["meter_reading"], bins=30)
-    plt.title("Meter Reading Distribution")
+    sns.histplot(df["meter_reading"], bins=50)
+    plt.title("Meter Reading Distribution (Raw)")
     plt.xlabel("meter_reading")
     plt.ylabel("Count")
     plt.tight_layout()
     plt.savefig(out_dir / "hist_meter_reading.png")
+
+    plt.figure()
+    sns.histplot(df["log_meter_reading"], bins=50)
+    plt.title("Meter Reading Distribution (Log-Transformed)")
+    plt.xlabel("log1p(meter_reading)")
+    plt.ylabel("Count")
+    plt.tight_layout()
+    plt.savefig(out_dir / "hist_log_meter_reading.png")
 
     plt.figure()
     sns.histplot(df["square_feet"], bins=30)
